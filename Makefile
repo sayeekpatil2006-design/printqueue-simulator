@@ -5,10 +5,11 @@ LDFLAGS = -lpthread
 TARGET = printqueue_server
 TEST_TARGET = test_runner
 BASICS_TARGET = queue_basics
+INTERACTIVE_TARGET = interactive_queue
 SRCS = queue.cpp server.cpp main.cpp
 OBJS = $(SRCS:.cpp=.o)
 
-all: $(TARGET) $(TEST_TARGET) $(BASICS_TARGET)
+all: $(TARGET) $(TEST_TARGET) $(BASICS_TARGET) $(INTERACTIVE_TARGET)
 
 $(TARGET): $(OBJS)
 	$(CXX) $(CXXFLAGS) -o $(TARGET) $(OBJS) $(LDFLAGS)
@@ -19,11 +20,17 @@ $(TEST_TARGET): queue.cpp test_queue.cpp
 $(BASICS_TARGET): queue_basics.cpp
 	$(CXX) $(CXXFLAGS) queue_basics.cpp -o $(BASICS_TARGET)
 
+$(INTERACTIVE_TARGET): interactive_queue.cpp
+	$(CXX) $(CXXFLAGS) interactive_queue.cpp -o $(INTERACTIVE_TARGET)
+
 test: $(TEST_TARGET)
 	./$(TEST_TARGET)
 
 basics: $(BASICS_TARGET)
 	./$(BASICS_TARGET)
+
+interactive: $(INTERACTIVE_TARGET)
+	./$(INTERACTIVE_TARGET)
 
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
@@ -32,6 +39,6 @@ run: $(TARGET)
 	./$(TARGET) 8080
 
 clean:
-	rm -f $(OBJS) $(TARGET) $(TEST_TARGET) $(BASICS_TARGET)
+	rm -f $(OBJS) $(TARGET) $(TEST_TARGET) $(BASICS_TARGET) $(INTERACTIVE_TARGET)
 
-.PHONY: all run test basics clean
+.PHONY: all run test basics interactive clean

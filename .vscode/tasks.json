@@ -38,6 +38,17 @@
       }
     },
     {
+      "label": "Run Interactive Queue (User Input)",
+      "type": "shell",
+      "command": "./interactive_queue",
+      "dependsOn": "Build PrintQueue Server (Offline)",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new",
+        "focus": true
+      }
+    },
+    {
       "label": "Clean Build Artifacts (Offline)",
       "type": "shell",
       "command": "make clean",

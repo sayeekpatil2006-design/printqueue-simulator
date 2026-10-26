@@ -4,6 +4,7 @@
 printqueue_server
 test_runner
 queue_basics
+interactive_queue
 
 # Build directories
 build/
