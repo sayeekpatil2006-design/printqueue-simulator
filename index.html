@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PrintQueue Simulator — Interactive FIFO Printer Management & Learning Game</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- System font fallbacks configured in style.css for 100% offline compatibility -->
+</head>
+<body class="dark-theme">
+
+  <!-- TOP HEADER / NAV -->
+  <header class="navbar">
+    <div class="nav-brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="6 9 6 2 18 2 18 9"></polyline>
+          <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+          <rect x="6" y="14" width="12" height="8"></rect>
+        </svg>
+      </div>
+      <div>
+        <h1 class="brand-title">PrintQueue <span class="gradient-text">Simulator</span></h1>
+        <p class="brand-subtitle">Interactive C++ FIFO Queue Management & Educational Platform</p>
+      </div>
+    </div>
+
+    <!-- Backend Connection Indicator -->
+    <div class="nav-status-container">
+      <div id="backendStatusPill" class="status-pill status-checking" title="Click to test C++ server connection">
+        <span class="status-dot"></span>
+        <span id="backendStatusText">Checking C++ Backend...</span>
+      </div>
+      <button id="btnQuickDemo" class="btn btn-secondary btn-sm" title="Quickly load Sayali, Rahul & Priya demonstration">
+        <span>⚡ Load Demo Scenario</span>
+      </button>
+      <button id="btnOpenDocs" class="btn btn-outline btn-sm">
+        <span>📖 DSA Theory</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- NAVIGATION TABS -->
+  <nav class="tab-bar">
+    <button class="tab-btn active" data-tab="tab-dashboard">
+      <span class="tab-icon">🖨️</span> Printer Dashboard
+    </button>
+    <button class="tab-btn" data-tab="tab-lab">
+      <span class="tab-icon">🧪</span> Queue Laboratory
+    </button>
+    <button class="tab-btn" data-tab="tab-game">
+      <span class="tab-icon">🎮</span> FIFO Challenge Game
+      <span class="badge badge-accent">3 Levels</span>
+    </button>
+    <button class="tab-btn" data-tab="tab-history">
+      <span class="tab-icon">📊</span> History & Operation Logs
+    </button>
+  </nav>
+
+  <!-- NOTIFICATION BANNER (if running in standalone fallback or connected) -->
+  <div id="connectionBanner" class="connection-banner">
+    <span class="banner-icon">ℹ️</span>
+    <span id="bannerMessage">Initializing system...</span>
+    <button id="bannerActionBtn" class="btn btn-link btn-xs" style="display:none;">View Setup Guide</button>
+    <button class="banner-close" onclick="this.parentElement.style.display='none'">&times;</button>
+  </div>
+
+  <!-- MAIN CONTAINER -->
+  <main class="main-content">
+
+    <!-- ================================================================= -->
+    <!-- TAB 1: PRINTER DASHBOARD                                          -->
+    <!-- ================================================================= -->
+    <section id="tab-dashboard" class="tab-content active">
+
+      <!-- STATS METRICS ROW -->
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-header">
+            <span class="metric-title">Total Submitted</span>
+            <span class="metric-icon">📥</span>
+          </div>
+          <div class="metric-value" id="statTotalSubmitted">0</div>
+          <div class="metric-sub">Lifetime arrival count</div>
+        </div>
+
+        <div class="metric-card highlight-pending">
+          <div class="metric-header">
+            <span class="metric-title">Pending In Queue</span>
+            <span class="metric-icon">⏳</span>
+          </div>
+          <div class="metric-value" id="statPendingJobs">0</div>
+          <div class="metric-sub">Waiting for FIFO dequeue</div>
+        </div>
+
+        <div class="metric-card highlight-success">
+          <div class="metric-header">
+            <span class="metric-title">Completed Jobs</span>
+            <span class="metric-icon">✅</span>
+          </div>
+          <div class="metric-value" id="statCompletedJobs">0</div>
+          <div class="metric-sub">Finished successfully</div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-header">
+            <span class="metric-title">Total Pages Printed</span>
+            <span class="metric-icon">📄</span>
+          </div>
+          <div class="metric-value" id="statTotalPages">0</div>
+          <div class="metric-sub">Pages processed</div>
+        </div>
+
+        <div class="metric-card highlight-printer">
+          <div class="metric-header">
+            <span class="metric-title">Printer Status</span>
+            <span class="metric-icon">⚡</span>
+          </div>
+          <div class="metric-value status-text-idle" id="statPrinterStatus">IDLE</div>
+          <div class="metric-sub" id="statEstTime">Est. Wait: 0s</div>
+        </div>
+      </div>
+
+      <!-- SIMULATION WORKSPACE: VIRTUAL PRINTER + CONTROLS -->
+      <div class="workspace-grid">
+        
+        <!-- VIRTUAL PRINTER HARDWARE PANEL -->
+        <div class="card printer-card">
+          <div class="card-header">
+            <div class="card-title">
+              <span class="dot-indicator" id="printerLed"></span>
+              <h3>Virtual Laser Printer</h3>
+            </div>
+            <span class="badge" id="printerModeBadge">Single Job Processor</span>
+          </div>
+
+          <div class="printer-chassis">
+            <!-- Paper feed animation tray -->
+            <div class="printer-top-slot">
+              <div class="paper-sheet" id="printerPaperSheet">
+                <div class="paper-line"></div>
+                <div class="paper-line"></div>
+                <div class="paper-line"></div>
+              </div>
+            </div>
+
+            <!-- Printer Display Screen -->
+            <div class="printer-lcd-screen">
+              <div class="lcd-header">
+                <span class="lcd-label">LAB PRINTER #01</span>
+                <span class="lcd-state" id="lcdStateText">READY FOR JOBS</span>
+              </div>
+              <div class="lcd-body" id="lcdBodyContent">
+                <div class="lcd-idle-message">
+                  <p>Printer idle. Queue is ready.</p>
+                  <small>Jobs process strictly in First-In, First-Out (FIFO) order.</small>
+                </div>
+              </div>
+              <!-- Live Progress Bar -->
+              <div class="lcd-progress-container" id="lcdProgressContainer" style="display: none;">
+                <div class="lcd-progress-bar" id="lcdProgressBar" style="width: 0%;"></div>
+                <span class="lcd-progress-label" id="lcdProgressText">0%</span>
+              </div>
+            </div>
+
+            <!-- Printer base and paper output -->
+            <div class="printer-base">
+              <div class="printer-tray-ledge"></div>
+            </div>
+          </div>
+
+          <!-- PRINTER CONTROLS -->
+          <div class="printer-controls">
+            <div class="btn-group">
+              <button id="btnPrintNext" class="btn btn-primary" title="Dequeue the front job and begin printing">
+                <span>▶ Print Next (FIFO Dequeue)</span>
+              </button>
+              <button id="btnAutoPrint" class="btn btn-accent" title="Automatically process all jobs in FIFO sequence">
+                <span>⚡ Start Auto-Print</span>
+              </button>
+              <button id="btnPausePrint" class="btn btn-warning" style="display:none;" title="Pause printing">
+                <span>⏸ Pause</span>
+              </button>
+              <button id="btnResumePrint" class="btn btn-accent" style="display:none;" title="Resume printing">
+                <span>▶ Resume</span>
+              </button>
+            </div>
+
+            <div class="btn-group-secondary">
+              <button id="btnPeekFront" class="btn btn-outline btn-sm" title="View element at front pointer without removing">
+                <span>🔍 View Front Job</span>
+              </button>
+              <button id="btnPeekRear" class="btn btn-outline btn-sm" title="View element at rear pointer without removing">
+                <span>🔎 View Rear Job</span>
+              </button>
+              <button id="btnClearQueue" class="btn btn-outline-danger btn-sm" title="Clear waiting jobs (safe: does not cancel active printing)">
+                <span>🗑️ Clear Waiting</span>
+              </button>
+              <button id="btnResetSimulation" class="btn btn-outline-danger btn-sm" title="Reset queue, counters, and history">
+                <span>🔄 Reset All</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- SUBMIT PRINT JOB FORM -->
+        <div class="card form-card">
+          <div class="card-header">
+            <div class="card-title">
+              <span class="card-icon">➕</span>
+              <h3>Submit Print Job</h3>
+            </div>
+            <span class="badge badge-info">FIFO Enqueue</span>
+          </div>
+
+          <form id="printJobForm" class="job-form" novalidate>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="studentName">Student Name <span class="required">*</span></label>
+                <input type="text" id="studentName" placeholder="e.g. Sayali" required autocomplete="off">
+                <span class="form-error" id="studentNameError">Student name is required</span>
+              </div>
+
+              <div class="form-group">
+                <label for="docType">Document Type</label>
+                <select id="docType">
+                  <option value="PDF">📄 PDF Document</option>
+                  <option value="DOCX">📝 Word Document (DOCX)</option>
+                  <option value="CODE">💻 Source Code (.cpp, .py)</option>
+                  <option value="PPTX">📊 Presentation (PPTX)</option>
+                  <option value="SHEET">📈 Spreadsheet (XLSX)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="documentName">Document Name <span class="required">*</span></label>
+                <input type="text" id="documentName" placeholder="e.g. DSA_Assignment.pdf" required autocomplete="off">
+                <span class="form-error" id="documentNameError">Document name is required</span>
+              </div>
+
+              <div class="form-group">
+                <label for="pageCount">Number of Pages <span class="required">*</span></label>
+                <input type="number" id="pageCount" min="1" max="100" value="5" required>
+                <span class="form-error" id="pageCountError">Page count must be a positive integer</span>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" id="btnSubmitJob" class="btn btn-success btn-block">
+                <span>➕ Submit to Queue Rear (Enqueue)</span>
+              </button>
+            </div>
+
+            <!-- Quick Template Chips -->
+            <div class="quick-templates">
+              <span class="template-label">Quick Add Demo:</span>
+              <button type="button" class="chip" data-name="Sayali" data-doc="DSA_Assignment.pdf" data-pages="5">Sayali (5p)</button>
+              <button type="button" class="chip" data-name="Rahul" data-doc="OS_Notes.pdf" data-pages="10">Rahul (10p)</button>
+              <button type="button" class="chip" data-name="Priya" data-doc="DBMS_Project.pdf" data-pages="7">Priya (7p)</button>
+              <button type="button" class="chip" data-name="Amit" data-doc="CN_Lab_Report.pdf" data-pages="12">Amit (12p)</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- LIVE QUEUE VISUALIZATION SECTION -->
+      <div class="card queue-visualizer-card">
+        <div class="card-header visualizer-header">
+          <div class="card-title">
+            <span class="card-icon">🔄</span>
+            <div>
+              <h3>Live Waiting Queue Visualization</h3>
+              <p class="section-desc">Strict FIFO ordering: Elements exit from the <strong>Front (Left)</strong> and enter at the <strong>Rear (Right)</strong>.</p>
+            </div>
+          </div>
+          <div class="queue-meta">
+            <span class="queue-pointer-pill">Front Pointer: <strong id="lblFrontId">None</strong></span>
+            <span class="queue-pointer-pill">Rear Pointer: <strong id="lblRearId">None</strong></span>
+            <span class="badge badge-accent" id="lblQueueSize">0 Jobs Waiting</span>
+          </div>
+        </div>
+
+        <!-- Flow Direction Bar -->
+        <div class="flow-indicator-bar">
+          <span class="flow-tag front-tag">⬅ FRONT (Next to Print)</span>
+          <div class="flow-arrow-line">
+            <span>Processing Direction (First-In, First-Out)</span>
+          </div>
+          <span class="flow-tag rear-tag">REAR (New Arrivals Enter Here) ➡</span>
+        </div>
+
+        <!-- The Horizontal Queue Container -->
+        <div class="queue-viewport" id="queueViewport">
+          <div id="queueEmptyPlaceholder" class="queue-empty-state">
+            <div class="empty-icon">📭</div>
+            <h4>Queue is currently empty</h4>
+            <p>Submit a print job above or load the demo scenario to visualize FIFO enqueue & dequeue operations.</p>
+          </div>
+          <div id="queueCardsContainer" class="queue-cards-track" style="display: none;">
+            <!-- Document cards dynamically populated here with animated arrows -->
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- TAB 2: QUEUE LABORATORY (DSA Interactive Workbench)               -->
+    <!-- ================================================================= -->
+    <section id="tab-lab" class="tab-content">
+      <div class="lab-intro-banner">
+        <h2>🧪 Data Structures Laboratory: Queue Pointer Workbench</h2>
+        <p>Experiment step-by-step with low-level queue operations. Observe front and rear pointers, transition states, and test boundary conditions such as <strong>Queue Underflow</strong>.</p>
+      </div>
+
+      <div class="lab-grid">
+        <!-- Interactive Controls -->
+        <div class="card lab-controls-card">
+          <div class="card-header">
+            <h3>Manual Queue Operations</h3>
+            <span class="badge badge-accent">Step-by-Step</span>
+          </div>
+
+          <div class="lab-form">
+            <div class="form-group">
+              <label for="labStudentName">Student Name</label>
+              <input type="text" id="labStudentName" value="Kavita" placeholder="Student name">
+            </div>
+            <div class="form-group">
+              <label for="labDocName">Document Name</label>
+              <input type="text" id="labDocName" value="Lab_Report_04.pdf" placeholder="Document title">
+            </div>
+            <div class="form-group">
+              <label for="labPages">Pages</label>
+              <input type="number" id="labPages" value="4" min="1" max="50">
+            </div>
+
+            <div class="lab-buttons-grid">
+              <button id="btnLabEnqueue" class="btn btn-primary">
+                <span>➕ enqueue(job)</span>
+                <small>Insert at Rear • O(1)</small>
+              </button>
+
+              <button id="btnLabDequeue" class="btn btn-warning">
+                <span>➖ dequeue()</span>
+                <small>Remove from Front • O(1)</small>
+              </button>
+
+              <button id="btnLabPeekFront" class="btn btn-outline">
+                <span>👁️ peekFront()</span>
+                <small>Inspect Front • O(1)</small>
+              </button>
+
+              <button id="btnLabPeekRear" class="btn btn-outline">
+                <span>👁️ peekRear()</span>
+                <small>Inspect Rear • O(1)</small>
+              </button>
+
+              <button id="btnLabIsEmpty" class="btn btn-outline">
+                <span>❓ isEmpty()</span>
+                <small>Check if Size == 0</small>
+              </button>
+
+              <button id="btnLabClear" class="btn btn-outline-danger">
+                <span>🗑️ clearQueue()</span>
+                <small>Deallocate all nodes</small>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pointer & State Inspector -->
+        <div class="card lab-inspector-card">
+          <div class="card-header">
+            <h3>Memory & Pointer Architecture</h3>
+            <span class="badge" id="labSizeBadge">Size: 0</span>
+          </div>
+
+          <div class="pointer-visual-display">
+            <div class="pointer-box" id="boxFrontPointer">
+              <div class="pointer-label">frontPtr</div>
+              <div class="pointer-val" id="valFrontPointer">nullptr</div>
+              <small>Points to FIFO head</small>
+            </div>
+
+            <div class="pointer-bridge">
+              <div class="bridge-line"></div>
+              <div class="bridge-label" id="bridgeNodeCount">0 Nodes in Memory</div>
+            </div>
+
+            <div class="pointer-box" id="boxRearPointer">
+              <div class="pointer-label">rearPtr</div>
+              <div class="pointer-val" id="valRearPointer">nullptr</div>
+              <small>Points to FIFO tail</small>
+            </div>
+          </div>
+
+          <!-- Step-by-Step Transition Box -->
+          <div class="transition-container">
+            <h4>Latest Operation Transition & Analysis</h4>
+            <div class="transition-box">
+              <div class="trans-row">
+                <span class="trans-label">Operation:</span>
+                <span class="trans-value" id="transOpName">None executed yet</span>
+              </div>
+              <div class="trans-row">
+                <span class="trans-label">Before State:</span>
+                <code class="trans-code" id="transBeforeState">[Empty]</code>
+              </div>
+              <div class="trans-row">
+                <span class="trans-label">After State:</span>
+                <code class="trans-code highlight-after" id="transAfterState">[Empty]</code>
+              </div>
+              <div class="trans-explanation" id="transExplanation">
+                Select an operation to execute and inspect its algorithmic breakdown and pointer changes.
+              </div>
+            </div>
+          </div>
+
+          <!-- Underflow Callout (Shown when underflow triggered) -->
+          <div id="underflowAlert" class="underflow-alert" style="display: none;">
+            <div class="alert-icon">⚠️</div>
+            <div>
+              <strong>Queue Underflow Exception Encountered!</strong>
+              <p>Attempted to dequeue from an empty queue (<code>frontPtr == nullptr</code>). In standard C++, accessing <code>std::queue::front()</code> or <code>pop()</code> on an empty queue invokes undefined behavior; our implementation safely guards this check and throws <code>QueueUnderflowException</code>.</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- TAB 3: FIFO CHALLENGE GAME (DSA Interactive Quiz)                 -->
+    <!-- ================================================================= -->
+    <section id="tab-game" class="tab-content">
+      <div class="game-header-card">
+        <div class="game-header-info">
+          <h2>🎮 FIFO Challenge Game</h2>
+          <p>Test and master your understanding of First-In, First-Out queue principles across 3 levels of increasing challenge.</p>
+        </div>
+
+        <div class="game-scoreboard">
+          <div class="score-pill">
+            <span class="label">Score</span>
+            <span class="value" id="gameScore">0</span>
+          </div>
+          <div class="score-pill">
+            <span class="label">Streak</span>
+            <span class="value" id="gameStreak">0 🔥</span>
+          </div>
+          <div class="score-pill">
+            <span class="label">Timer</span>
+            <span class="value timer-val" id="gameTimer">20s</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Level Selector Tabs -->
+      <div class="level-selector">
+        <button class="level-tab active" data-level="1">
+          <span class="lvl-num">Level 1</span>
+          <span class="lvl-name">Basic FIFO</span>
+          <span class="lvl-desc">Identify the next document to print</span>
+        </button>
+        <button class="level-tab" data-level="2">
+          <span class="lvl-num">Level 2</span>
+          <span class="lvl-name">Queue Operations</span>
+          <span class="lvl-desc">Predict queue state after push & pop</span>
+        </button>
+        <button class="level-tab" data-level="3">
+          <span class="lvl-num">Level 3</span>
+          <span class="lvl-name">Printer Challenge</span>
+          <span class="lvl-desc">Dynamic concurrent arrivals & printing</span>
+        </button>
+      </div>
+
+      <!-- Game Interactive Arena -->
+      <div class="card game-arena-card">
+        <div class="question-header">
+          <span class="badge badge-accent" id="gameLevelBadge">Level 1: Basic FIFO</span>
+          <span class="question-counter" id="gameQuestionCounter">Question 1 of 5</span>
+        </div>
+
+        <!-- Question Scenario Viewport -->
+        <div class="game-scenario-box" id="gameScenarioBox">
+          <h3 id="gameQuestionText">Loading question...</h3>
+          <div class="scenario-visual" id="gameScenarioVisual">
+            <!-- Simulated Queue visualization for this question -->
+          </div>
+        </div>
+
+        <!-- Answer Options -->
+        <div class="answers-grid" id="gameAnswersGrid">
+          <!-- Dynamically populated answer buttons -->
+        </div>
+
+        <!-- Result / Explanation Box -->
+        <div class="game-feedback-box" id="gameFeedbackBox" style="display: none;">
+          <div class="feedback-header">
+            <span class="feedback-icon" id="feedbackIcon">✅</span>
+            <h4 id="feedbackTitle">Correct!</h4>
+          </div>
+          <p id="feedbackText">Explanation of why this adheres to FIFO...</p>
+          <div class="feedback-actions">
+            <button id="btnGameNextQuestion" class="btn btn-primary">
+              <span>Next Question ➡</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Game Completion Modal / Summary (hidden by default) -->
+      <div id="gameSummaryModal" class="modal-overlay" style="display: none;">
+        <div class="modal-card">
+          <div class="modal-header">
+            <h3>🏆 FIFO Challenge Completed!</h3>
+          </div>
+          <div class="modal-body text-center">
+            <div class="summary-trophy">🎓</div>
+            <h2 id="summaryScoreText">Final Score: 450 pts</h2>
+            <p id="summaryRankText">Master of First-In, First-Out Queues!</p>
+            <div class="summary-stats-grid">
+              <div class="summary-stat-box">
+                <span class="stat-number" id="summaryAccuracy">100%</span>
+                <span class="stat-label">Accuracy</span>
+              </div>
+              <div class="summary-stat-box">
+                <span class="stat-number" id="summaryMaxStreak">5 🔥</span>
+                <span class="stat-label">Max Streak</span>
+              </div>
+              <div class="summary-stat-box">
+                <span class="stat-number" id="summaryTimeBonus">+50</span>
+                <span class="stat-label">Speed Bonus</span>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button id="btnRestartGame" class="btn btn-primary btn-block">
+              <span>🔄 Play Again</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- TAB 4: HISTORY & OPERATION LOGS                                   -->
+    <!-- ================================================================= -->
+    <section id="tab-history" class="tab-content">
+      <div class="history-grid">
+        
+        <!-- Completed Jobs Table -->
+        <div class="card completed-table-card">
+          <div class="card-header">
+            <div class="card-title">
+              <span class="card-icon">🖨️</span>
+              <h3>Completed Print Jobs</h3>
+            </div>
+            <span class="badge badge-success" id="lblCompletedCount">0 Printed</span>
+          </div>
+
+          <div class="table-responsive">
+            <table class="data-table" id="tableCompletedJobs">
+              <thead>
+                <tr>
+                  <th>Job ID</th>
+                  <th>Student Name</th>
+                  <th>Document Name</th>
+                  <th>Pages</th>
+                  <th>Arrival #</th>
+                  <th>Completion #</th>
+                  <th>Status</th>
+                  <th>Time</th>
+                </tr>
+              </thead>
+              <tbody id="tbodyCompletedJobs">
+                <tr class="empty-table-row">
+                  <td colspan="8">No print jobs completed yet. Process jobs from the dashboard.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Real-time Queue Operations Log -->
+        <div class="card log-card">
+          <div class="card-header">
+            <div class="card-title">
+              <span class="card-icon">📜</span>
+              <h3>C++ Queue Operation Audit Log</h3>
+            </div>
+            <button id="btnClearLogs" class="btn btn-outline btn-xs">Clear Log View</button>
+          </div>
+
+          <div class="log-container" id="logContainer">
+            <div class="log-entry">
+              <span class="log-time">--:--:--</span>
+              <span class="log-badge badge-info">INIT</span>
+              <span class="log-desc">Audit log initialized. Waiting for queue actions.</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL: FRONT / REAR PEEK INSPECTOR -->
+  <div id="inspectorModal" class="modal-overlay" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="inspectorModalTitle">Queue Element Inspector</h3>
+        <button class="modal-close-btn" onclick="document.getElementById('inspectorModal').style.display='none'">&times;</button>
+      </div>
+      <div class="modal-body" id="inspectorModalBody">
+        <!-- Content inserted dynamically -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="document.getElementById('inspectorModal').style.display='none'">Close Inspector</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: DSA THEORY & DEMONSTRATION GUIDE -->
+  <div id="docsModal" class="modal-overlay" style="display: none;">
+    <div class="modal-card modal-lg">
+      <div class="modal-header">
+        <h3>📘 DSA Guide: Queue Data Structure & FIFO Principle</h3>
+        <button class="modal-close-btn" onclick="document.getElementById('docsModal').style.display='none'">&times;</button>
+      </div>
+      <div class="modal-body docs-body">
+        <h4>1. Problem Statement & FIFO Overview</h4>
+        <p>In a computer lab with multiple students sharing a single printer, print requests must be serviced fairly in the exact order they were received. This scheduling policy is known as <strong>First-In, First-Out (FIFO)</strong>, modeled by the <strong>Queue</strong> data structure.</p>
+
+        <h4>2. Queue Operations & Time Complexity</h4>
+        <table class="docs-table">
+          <thead>
+            <tr><th>Operation</th><th>Role</th><th>Custom Linked List</th><th>STL std::queue</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>enqueue(x)</code></td><td>Insert at rear</td><td>O(1)</td><td><code>push(x)</code> O(1)</td></tr>
+            <tr><td><code>dequeue()</code></td><td>Remove from front</td><td>O(1)</td><td><code>pop()</code> O(1)</td></tr>
+            <tr><td><code>peekFront()</code></td><td>Inspect front element</td><td>O(1)</td><td><code>front()</code> O(1)</td></tr>
+            <tr><td><code>peekRear()</code></td><td>Inspect rear element</td><td>O(1)</td><td><code>back()</code> O(1)</td></tr>
+            <tr><td><code>isEmpty()</code></td><td>Check if size == 0</td><td>O(1)</td><td><code>empty()</code> O(1)</td></tr>
+            <tr><td><code>size()</code></td><td>Return active count</td><td>O(1)</td><td><code>size()</code> O(1)</td></tr>
+          </tbody>
+        </table>
+
+        <h4>3. Demonstration Scenario (Lab Viva-Voce Walkthrough)</h4>
+        <div class="code-block">
+1. Submit JOB-101: Sayali — DSA_Assignment.pdf — 5 pages.
+2. Submit JOB-102: Rahul — OS_Notes.pdf — 10 pages.
+3. Submit JOB-103: Priya — DBMS_Project.pdf — 7 pages.
+4. Queue State: [FRONT: JOB-101] ───► [JOB-102] ───► [REAR: JOB-103]
+5. Click 'Print Next': JOB-101 is dequeued and printed FIRST.
+6. Submit JOB-104 while printing: JOB-104 enters at the REAR, behind JOB-103.
+7. Result: Demonstrates strict FIFO ordering — older requests are never overtaken!
+        </div>
+
+        <h4>4. C++ Backend Setup (macOS / Linux)</h4>
+        <div class="code-block">
+# Compile with clang++
+clang++ -std=c++17 -Wall -Wextra queue.cpp server.cpp main.cpp -o printqueue_server -lpthread
+
+# Or using Make
+make run
+
+# Server starts on http://localhost:8080 serving both REST API & Web Dashboard!
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="document.getElementById('docsModal').style.display='none'">Got It</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

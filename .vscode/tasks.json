@@ -1,0 +1,50 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Build PrintQueue Server (Offline)",
+      "type": "shell",
+      "command": "make all",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": ["$gcc"]
+    },
+    {
+      "label": "Run Unit Tests (Offline)",
+      "type": "shell",
+      "command": "./test_runner",
+      "group": "test",
+      "dependsOn": "Build PrintQueue Server (Offline)",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Start Server (Port 8080 - Offline)",
+      "type": "shell",
+      "command": "./printqueue_server 8080",
+      "isBackground": true,
+      "dependsOn": "Build PrintQueue Server (Offline)",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Clean Build Artifacts (Offline)",
+      "type": "shell",
+      "command": "make clean",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    }
+  ]
+}

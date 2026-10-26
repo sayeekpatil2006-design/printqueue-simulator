@@ -1,0 +1,23 @@
+# Compiled Object Files & Binaries
+*.o
+*.obj
+printqueue_server
+test_runner
+
+# Build directories
+build/
+bin/
+
+# macOS system files
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# VS Code user-specific workspace state (keep tasks.json and launch.json)
+.vscode/*.log
+.vscode/.browse.c_cpp.db*
+
+# Crash logs and core dumps
+core
+*.dSYM/

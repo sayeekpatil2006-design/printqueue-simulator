@@ -1,0 +1,5 @@
+*.o
+printqueue_server
+test_runner
+.DS_Store
+.git

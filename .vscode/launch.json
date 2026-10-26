@@ -1,0 +1,31 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch PrintQueue Server (macOS / lldb)",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/printqueue_server",
+      "args": ["8080"],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "lldb",
+      "preLaunchTask": "Build PrintQueue Server (Offline)"
+    },
+    {
+      "name": "Run Queue Unit Tests (macOS / lldb)",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/test_runner",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "lldb",
+      "preLaunchTask": "Build PrintQueue Server (Offline)"
+    }
+  ]
+}
