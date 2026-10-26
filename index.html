@@ -55,6 +55,9 @@
     <button class="tab-btn" data-tab="tab-history">
       <span class="tab-icon">📊</span> History & Operation Logs
     </button>
+    <button class="tab-btn" data-tab="tab-concepts">
+      <span class="tab-icon">📘</span> C++ Queue Concepts
+    </button>
   </nav>
 
   <!-- NOTIFICATION BANNER (if running in standalone fallback or connected) -->
@@ -604,6 +607,196 @@
           </div>
         </div>
 
+      </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- TAB 5: C++ QUEUE CONCEPTS & DSA CHEAT SHEET                       -->
+    <!-- ================================================================= -->
+    <section id="tab-concepts" class="tab-content">
+      <div class="lab-intro-banner">
+        <h2>📘 Basic Concepts of Queue Data Structure in C++</h2>
+        <p>A simple, beginner-friendly guide to understanding the Queue, its FIFO principle, time complexities, and how it is implemented in C++.</p>
+      </div>
+
+      <div class="workspace-grid">
+        <!-- CONCEPT CARD 1: WHAT IS A QUEUE -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <span class="card-icon">💡</span>
+              <h3>1. What is a Queue?</h3>
+            </div>
+            <span class="badge badge-info">Linear Data Structure</span>
+          </div>
+          <p style="color:var(--text-muted); font-size:0.9rem; line-height:1.6; margin-bottom:1rem;">
+            A <strong>Queue</strong> is a linear data structure that works on the <strong>First-In, First-Out (FIFO)</strong> principle.
+            The element that goes in first is the first one to come out.
+          </p>
+          <div style="background:var(--bg-surface); padding:1rem; border-radius:var(--radius-md); border-left:3px solid var(--accent-blue); font-size:0.85rem; color:#cbd5e1;">
+            <strong>Real-Life Analogy:</strong><br>
+            Think of a queue at a movie ticket counter or a printer in a university computer lab:
+            <ul style="margin:0.5rem 0 0 1.25rem;">
+              <li>The first student to send a document gets it printed first.</li>
+              <li>New students join at the <strong>rear (tail)</strong> of the line.</li>
+              <li>No one can jump the queue or exit from the middle.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- CONCEPT CARD 2: FIFO PRINCIPLE -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <span class="card-icon">🔄</span>
+              <h3>2. The FIFO Principle</h3>
+            </div>
+            <span class="badge badge-success">First-In, First-Out</span>
+          </div>
+          <p style="color:var(--text-muted); font-size:0.9rem; line-height:1.6; margin-bottom:1rem;">
+            Unlike a <strong>Stack</strong> which is <em>Last-In, First-Out (LIFO)</em>, a Queue has <strong>two distinct open ends</strong>:
+          </p>
+          <div class="code-block" style="text-align:center; font-size:0.85rem; color:#38bdf8;">
+[FRONT] ── (DEQUEUE) ──► [Node 1] ──► [Node 2] ──► [Node 3] ◄── (ENQUEUE) ── [REAR]
+          </div>
+          <p style="color:var(--text-muted); font-size:0.85rem; line-height:1.5;">
+            • <strong>Front:</strong> The position where elements are removed (printed/serviced).<br>
+            • <strong>Rear:</strong> The position where new elements are inserted.
+          </p>
+        </div>
+      </div>
+
+      <!-- OPERATIONS TABLE -->
+      <div class="card" style="margin-bottom:1.5rem;">
+        <div class="card-header">
+          <div class="card-title">
+            <span class="card-icon">⚡</span>
+            <h3>3. Core Queue Operations in C++</h3>
+          </div>
+          <span class="badge badge-accent">All O(1) Constant Time</span>
+        </div>
+
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Operation</th>
+                <th>Description</th>
+                <th>C++ STL Method</th>
+                <th>Custom Queue Method</th>
+                <th>Time Complexity</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Enqueue</strong></td>
+                <td>Inserts a new element at the REAR of the queue</td>
+                <td><code>q.push(val)</code></td>
+                <td><code>enqueue(val)</code></td>
+                <td><span class="badge badge-success">O(1)</span></td>
+              </tr>
+              <tr>
+                <td><strong>Dequeue</strong></td>
+                <td>Removes the oldest element from the FRONT</td>
+                <td><code>q.pop()</code></td>
+                <td><code>dequeue()</code></td>
+                <td><span class="badge badge-success">O(1)</span></td>
+              </tr>
+              <tr>
+                <td><strong>Peek Front</strong></td>
+                <td>Inspects the front element without removing it</td>
+                <td><code>q.front()</code></td>
+                <td><code>peekFront()</code></td>
+                <td><span class="badge badge-success">O(1)</span></td>
+              </tr>
+              <tr>
+                <td><strong>Peek Rear</strong></td>
+                <td>Inspects the last inserted element without removing it</td>
+                <td><code>q.back()</code></td>
+                <td><code>peekRear()</code></td>
+                <td><span class="badge badge-success">O(1)</span></td>
+              </tr>
+              <tr>
+                <td><strong>isEmpty</strong></td>
+                <td>Checks if the queue has zero elements</td>
+                <td><code>q.empty()</code></td>
+                <td><code>isEmpty()</code></td>
+                <td><span class="badge badge-success">O(1)</span></td>
+              </tr>
+              <tr>
+                <td><strong>Size</strong></td>
+                <td>Returns the current count of elements</td>
+                <td><code>q.size()</code></td>
+                <td><code>size()</code></td>
+                <td><span class="badge badge-success">O(1)</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- C++ CODE EXAMPLE -->
+      <div class="workspace-grid">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <span class="card-icon">💻</span>
+              <h3>4. Simple C++ STL Example</h3>
+            </div>
+            <span class="badge badge-info">std::queue</span>
+          </div>
+          <div class="code-block">
+#include &lt;iostream&gt;
+#include &lt;queue&gt;
+#include &lt;string&gt;
+
+int main() {
+    // 1. Declare a queue of strings
+    std::queue&lt;std::string&gt; printLine;
+
+    // 2. Enqueue documents at rear (push)
+    printLine.push("Sayali_DSA.pdf");
+    printLine.push("Rahul_OS.pdf");
+    printLine.push("Priya_DBMS.pdf");
+
+    // 3. Inspect front and rear
+    std::cout &lt;&lt; "Next to print: " &lt;&lt; printLine.front() &lt;&lt; "\n"; // Sayali
+    std::cout &lt;&lt; "Last arrived:  " &lt;&lt; printLine.back() &lt;&lt; "\n";  // Priya
+
+    // 4. Process in FIFO order
+    while (!printLine.empty()) {
+        std::cout &lt;&lt; "Printing: " &lt;&lt; printLine.front() &lt;&lt; "\n";
+        printLine.pop(); // Remove from front
+    }
+    return 0;
+}
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <span class="card-icon">⚠️</span>
+              <h3>5. Common Pitfalls & Underflow</h3>
+            </div>
+            <span class="badge badge-danger">Important DSA Concept</span>
+          </div>
+          <div style="font-size:0.88rem; color:var(--text-muted); line-height:1.6;">
+            <p style="margin-bottom:0.75rem;">
+              <strong style="color:#f87171;">1. Queue Underflow:</strong><br>
+              Occurs when you attempt to <code>dequeue()</code> (or <code>pop()</code>) an empty queue. In C++, calling <code>q.front()</code> or <code>q.pop()</code> when <code>q.empty() == true</code> causes <strong>Undefined Behavior</strong> or a program crash. Always check:
+              <code>if (!q.empty()) { ... }</code>.
+            </p>
+            <p style="margin-bottom:0.75rem;">
+              <strong style="color:#60a5fa;">2. std::queue::pop() Does NOT Return Value:</strong><br>
+              In C++, <code>q.pop()</code> has a return type of <code>void</code>. You must call <code>q.front()</code> to access the value before calling <code>q.pop()</code>.
+            </p>
+            <p>
+              <strong style="color:#34d399;">3. Array vs Linked List Queue:</strong><br>
+              A linear array queue suffers from <em>false overflow</em> unless implemented as a <strong>Circular Queue</strong>. A linked-list queue dynamically allocates nodes with no fixed size limit.
+            </p>
+          </div>
+        </div>
       </div>
     </section>
 

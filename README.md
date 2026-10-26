@@ -62,7 +62,66 @@ The project uses a clean client-server architecture:
 
 ---
 
-## 3. C++ Queue Implementation Details
+## 3. Simple & Basic Concepts of C++ Queue Data Structure
+
+### 3.1 What is a Queue?
+A **Queue** is a linear data structure that adheres to the **First-In, First-Out (FIFO)** principle. The first item inserted into the queue is the first item to be removed.
+
+**Real-Life Analogy**:
+* Think of students waiting in a line at a university computer lab printer or a cinema ticket counter.
+* The student who arrives first gets served first.
+* New arrivals always join at the **rear (tail)** of the line.
+* No one can cut in line or leave from the middle.
+
+```
+                  ┌──────────────────────────────────────────────┐
+  [DEQUEUE / EXIT]│ Document 1 ──► Document 2 ──► Document 3     │ [ENQUEUE / ENTRY]
+ ◄────────────────│ (Front)                       (Rear)         │◄─────────────────
+                  └──────────────────────────────────────────────┘
+```
+
+### 3.2 The Core Queue Operations
+Every queue provides six fundamental operations, all executing in **$O(1)$ constant time**:
+
+| Operation | Everyday Term | C++ STL (`std::queue`) | Custom Queue (`PrinterQueue`) | What It Does |
+|---|---|---|---|---|
+| **Enqueue** | Add to line | `q.push(item)` | `enqueue(item)` | Inserts a new element at the **rear** of the queue. |
+| **Dequeue** | Service & leave | `q.pop()` | `dequeue()` | Removes the oldest element from the **front** of the queue. |
+| **Front** | Inspect next | `q.front()` | `peekFront()` | Views the element at the **front** without removing it. |
+| **Rear / Back**| Inspect last | `q.back()` | `peekRear()` | Views the element at the **rear** without removing it. |
+| **isEmpty** | Check if empty | `q.empty()` | `isEmpty()` | Returns `true` if 0 items are waiting, `false` otherwise. |
+| **Size** | Count items | `q.size()` | `size()` | Returns the number of items currently in the queue. |
+
+### 3.3 10-Line C++ Code Example
+```cpp
+#include <iostream>
+#include <queue>       // Header for std::queue
+
+int main() {
+    std::queue<std::string> printLine;
+
+    printLine.push("Sayali.pdf"); // Enqueue 1st
+    printLine.push("Rahul.pdf");  // Enqueue 2nd
+    printLine.push("Priya.pdf");  // Enqueue 3rd
+
+    std::cout << "Next to print: " << printLine.front() << "\n"; // Outputs: Sayali.pdf
+
+    // Process all jobs in FIFO order
+    while (!printLine.empty()) {
+        std::cout << "Printing: " << printLine.front() << "\n";
+        printLine.pop(); // Removes from front
+    }
+    return 0;
+}
+```
+
+### 3.4 Key Pitfalls & Underflow
+1. **Queue Underflow**: Attempting to dequeue or read from an empty queue (`frontPtr == nullptr` or `q.empty() == true`). In C++, calling `.front()` or `.pop()` on an empty queue causes undefined behavior or a crash. Always check `if (!q.empty())` first.
+2. **`std::queue::pop()` Returns `void`**: In standard C++, `pop()` removes an item but does not return it. Always call `front()` before calling `pop()` if you need the data.
+
+---
+
+## 4. C++ Queue Implementation Details
 
 The core data structure is implemented in [`queue.h`](file:///Users/sayee/Downloads/Projects/queue.h) and [`queue.cpp`](file:///Users/sayee/Downloads/Projects/queue.cpp).
 

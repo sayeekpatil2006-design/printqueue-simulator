@@ -3,6 +3,7 @@
 *.obj
 printqueue_server
 test_runner
+queue_basics
 
 # Build directories
 build/
